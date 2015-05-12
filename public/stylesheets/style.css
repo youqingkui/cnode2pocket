@@ -7,6 +7,11 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+div.cbtn{
+  text-align: center;
+  margin-top: 15px;
+}
+
 a {
   color: #00B7FF;
 }
@@ -17,6 +22,8 @@ div.SharedNoteView{
   height: 100%;
   overflow: hidden;
 }
+
+
 
 .wrapper#container-boundingbox {
   margin: 0;

@@ -24,6 +24,15 @@ app.use(session({
   saveUninitialized: true
 }))
 app.use express.static(path.join(__dirname, 'public'))
+
+app.use (req, res, next) ->
+  res.locals.username = req.session.username
+  res.locals.error    = req.session.error
+  res.locals.success  = req.session.success
+  req.session.error   = null
+  req.session.success = null
+  next()
+
 app.use '/', routes
 app.use '/users', users
 # catch 404 and forward to error handler

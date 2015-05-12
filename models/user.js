@@ -5,13 +5,19 @@
   mongoose = require('./mongoose');
 
   UserSchema = mongoose.Schema({
-    username: String,
+    username: {
+      type: String,
+      unique: true
+    },
     created: Number,
     token: String,
-    subscribe: Boolean
+    subscribe: {
+      type: Boolean,
+      "default": false
+    }
   });
 
-  module.exports = mongoose.model('User, UserSchema');
+  module.exports = mongoose.model('User', UserSchema);
 
 }).call(this);
 

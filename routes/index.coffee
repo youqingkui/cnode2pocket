@@ -1,12 +1,14 @@
 express = require('express')
 async = require('async')
 request = require('request')
+User = require('../models/user')
 router = express.Router()
+
 
 ### GET home page. ###
 
 router.get '/', (req, res, next) ->
-  res.render 'index', title: 'Express'
+  res.render 'access', title: 'Express'
   return
 
 
@@ -34,7 +36,9 @@ router.get '/auth', (req, res) ->
           cb(null, code)
 
         else
-          return console.log "get code error, body", body
+          console.log "get code error, body", body
+          req.session.error = "连接Pocket出错"
+          return res.redirect('/')
 
 
     directUrl:['getCode', (cb, result) ->
@@ -47,8 +51,13 @@ router.get '/auth', (req, res) ->
 
 
 router.get '/oauth_callback', (req, res) ->
+  if not req.session.code
+    return res.redirect('/')
+
   url = 'https://getpocket.com/v3/oauth/authorize'
   key = process.env.pocket
+  username = ''
+  token = ''
   form = {
     consumer_key:key
     code:req.session.code
@@ -62,10 +71,54 @@ router.get '/oauth_callback', (req, res) ->
     form:form
   }
 
-  request.post op, (err, response, body) ->
-    return console.log err if err
+  async.auto
+    getAccessInfo:(cb) ->
+      request.post op, (err, response, body) ->
+        return console.log err if err
 
-    console.log body
+        if response.statusCode is 200
+          console.log "body =>", body
+          infoArr = body.split('&')
+          token = infoArr[0].split('=')[1]
+          username = infoArr[1].split('=')[1]
+          cb()
+
+        else
+          req.session.error = "获取pocket token 出错"
+          return res.redirect('/')
+
+
+    checkUser:['getAccessInfo', (cb, result) ->
+      User.findOne {username:username}, (err, row) ->
+        return console.log err if err
+        if not row
+          cb()
+
+        else
+          row.token = token
+          row.save (err2, row2) ->
+            return console.log err2 if err2
+
+            console.log "in checkUser"
+            req.session.username = row2.username
+            req.session.subscribe = row2.subscribe
+            return res.redirect('/users')
+    ]
+
+    createUser:['checkUser', (cb) ->
+      newUser = new User()
+      newUser.token = token
+      newUser.username = username
+      newUser.created = Date.now()
+      newUser.save (err, row) ->
+        return console.log err if err
+        console.log "in createUser"
+        req.session.username = row.username
+        req.session.subscribe = row.subscribe
+        return res.redirect('/users')
+
+    ]
+
 
 
 module.exports = router
