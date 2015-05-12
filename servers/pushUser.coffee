@@ -51,7 +51,7 @@ class PushUser
 
       request.post op, (err, res, body) ->
         return console.log err if err
-
+        console.log body
         data = JSON.parse body
         console.log data.item.normal_url
         callback()

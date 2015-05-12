@@ -8,6 +8,8 @@ router = express.Router()
 ### GET home page. ###
 
 router.get '/', (req, res, next) ->
+  if req.session.username
+    return res.redirect('/users')
   res.render 'access', title: 'Express'
   return
 

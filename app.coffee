@@ -38,7 +38,11 @@ app.use (req, res, next) ->
   next()
 
 app.use '/', routes
-app.use '/users', users
+app.use '/users', (req, res, next)->
+  if not req.session.username
+    return res.redirect('/')
+  next()
+,users
 # catch 404 and forward to error handler
 app.use (req, res, next) ->
   err = new Error('Not Found')

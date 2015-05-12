@@ -62,7 +62,12 @@
 
   app.use('/', routes);
 
-  app.use('/users', users);
+  app.use('/users', function(req, res, next) {
+    if (!req.session.username) {
+      return res.redirect('/');
+    }
+    return next();
+  }, users);
 
   app.use(function(req, res, next) {
     var err;

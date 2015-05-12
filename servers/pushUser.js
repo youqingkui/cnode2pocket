@@ -68,6 +68,7 @@
           if (err) {
             return console.log(err);
           }
+          console.log(body);
           data = JSON.parse(body);
           console.log(data.item.normal_url);
           return callback();

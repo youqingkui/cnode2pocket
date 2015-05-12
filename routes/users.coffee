@@ -1,12 +1,48 @@
 express = require('express')
 PushUser = require('../servers/pushUser')
+Article = require('../models/article')
+User = require('../models/user')
 async = require('async')
 router = express.Router()
 
 ### GET users listing. ###
 
 router.get '/', (req, res, next) ->
-  return res.render 'users'
+
+  Article.count {}, (err, count) ->
+    return console.log err if err
+
+    title = "Pocket连接管理"
+    subscribe = req.session.subscribe
+
+    return res.render 'users',{title:title,subscribe:subscribe,count:count  }
+
+
+router.get '/subscribe', (req, res) ->
+  username = req.session.username
+  subscribe = req.session.subscribe
+
+  User.findOne {username:username}, (err, row) ->
+    return console.log err if err
+
+    if not row
+      req.session.error = "没有找到用户"
+      return res.redirect('/')
+
+    if subscribe is true
+      subscribe = false
+
+    else
+      subscribe = true
+
+    row.subscribe = subscribe
+    row.save (err2, row2) ->
+      return console.log err2 if err2
+
+      req.session.subscribe = subscribe
+
+      return res.redirect('/')
+
 
 
 router.get '/push', (req, res) ->

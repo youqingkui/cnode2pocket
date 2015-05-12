@@ -4,16 +4,27 @@ block content
   div.jumbotron
     div.container
       h3.title Cnode2Pocket
+      include tx
+
 
       div.row
         div.col-md-4.cbtn
-          a.btn.btn-success.btn-lg Access
+          a.btn.btn-success.btn-lg 已连接Pocket
 
         div.col-md-4.cbtn
-          a.btn.btn-primary.btn-lg(data-toggle="tooltip" data-placement="top" title="如果有新的精华，会自动推送到pocket") 订阅
+          if subscribe
+            a.btn.btn-success.btn-lg(href="/users/subscribe" data-toggle="tooltip" data-placement="top" title="如果有新的精华，会自动推送到pocket") 已订阅
+          else
+            a.btn.btn-primary.btn-lg(href="/users/subscribe" data-toggle="tooltip" data-placement="top" title="如果有新的精华，会自动推送到pocket") 订阅
+
 
 
         div.col-md-4.cbtn
-          a.btn.btn-primary.btn-lg(data-toggle="tooltip" data-placement="top" title="完整导入现有精华到Pocket") 导入
+          a.btn.btn-primary.btn-lg(href="/users/push" data-toggle="tooltip" data-placement="top" title="完整导入现有精华到Pocket") 导入
+            span.badge= count
 
+
+block script
+  script.
+    $('[data-toggle="tooltip"]').tooltip()
 
