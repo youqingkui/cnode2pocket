@@ -2,6 +2,7 @@ express = require('express')
 async = require('async')
 request = require('request')
 User = require('../models/user')
+saveErr = require('../servers/saveErr')
 router = express.Router()
 
 
@@ -31,14 +32,14 @@ router.get '/auth', (req, res) ->
   async.auto
     getCode:(cb) ->
       request.post op, (err, response, body) ->
-        return console.log err if err
+        return saveErr op.url, 1, {err:err} if err
 
         if response.statusCode is 200
           code = body.split('=')[1]
           cb(null, code)
 
         else
-          console.log "get code error, body", body
+          saveErr op.url, 2, {err:body}
           req.session.error = "连接Pocket出错"
           return res.redirect('/')
 
