@@ -4,7 +4,8 @@ favicon = require('serve-favicon')
 logger = require('morgan')
 cookieParser = require('cookie-parser')
 session = require('express-session')
-
+settings = require('./settings');
+MongoStore = require('connect-mongo')(session)
 bodyParser = require('body-parser')
 routes = require('./routes/index')
 users = require('./routes/users')
@@ -19,9 +20,12 @@ app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
 app.use cookieParser()
 app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true
+  secret: settings.cookieSecret,
+  store: new MongoStore({
+    db: settings.db
+  }),
+  saveUninitialized: true,
+  resave: true
 }))
 app.use express.static(path.join(__dirname, 'public'))
 
