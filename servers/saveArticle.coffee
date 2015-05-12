@@ -10,13 +10,14 @@ class ArticleSave
 
 
   getPage:(page, cb) ->
+    console.log "page=>", page
     self = @
     url = self.baseUrl + page
+    console.log url
     async.auto
       getInfo:(callback) ->
         request.get url, (err, res, body) ->
           return console.log err if err
-
           data = JSON.parse(body)
 
           callback(null, data)
@@ -41,7 +42,8 @@ class ArticleSave
                   console.log row2
 
                 self.pushUser(tmp)
-            callback()
+
+          self.getPage(page + 1, cb)
 
         else
           console.log "page =>", page, data
@@ -67,19 +69,20 @@ class ArticleSave
           cb()
 
       pushInfo:['findUser', (cb) ->
-        async.eachLimit users, 10, (item, callback) ->
-          form.access_token = item.token
-          op =
-            form:form
-            url:'https://getpocket.com/v3/add'
+        if users.length
+          async.eachLimit users, 10, (item, callback) ->
+            form.access_token = item.token
+            op =
+              form:form
+              url:'https://getpocket.com/v3/add'
 
-          request.post op, (err, res, body) ->
-            return console.log err if err
-            console.log body
-            callback()
+            request.post op, (err, res, body) ->
+              return console.log err if err
+              console.log body
+              callback()
 
-        ,() ->
-          console.log "### eachLimit all do ###"
+          ,() ->
+            console.log "### eachLimit all do ###"
       ]
 
 

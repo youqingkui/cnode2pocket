@@ -18,8 +18,10 @@
 
     ArticleSave.prototype.getPage = function(page, cb) {
       var self, url;
+      console.log("page=>", page);
       self = this;
       url = self.baseUrl + page;
+      console.log(url);
       return async.auto({
         getInfo: function(callback) {
           return request.get(url, function(err, res, body) {
@@ -36,14 +38,14 @@
             var data;
             data = result.getInfo;
             if (data.data.length) {
-              return data.data.forEach(function(item) {
+              data.data.forEach(function(item) {
                 var tmp;
                 tmp = {
                   url: 'https://cnodejs.org/topic/' + item.id,
                   title: item.title,
                   created: Date.now()
                 };
-                Article.findOne({
+                return Article.findOne({
                   url: tmp.url
                 }, function(err, row) {
                   var newArt;
@@ -61,8 +63,8 @@
                     return self.pushUser(tmp);
                   }
                 });
-                return callback();
               });
+              return self.getPage(page + 1, cb);
             } else {
               return console.log("page =>", page, data);
             }
@@ -96,23 +98,25 @@
         },
         pushInfo: [
           'findUser', function(cb) {
-            return async.eachLimit(users, 10, function(item, callback) {
-              var op;
-              form.access_token = item.token;
-              op = {
-                form: form,
-                url: 'https://getpocket.com/v3/add'
-              };
-              return request.post(op, function(err, res, body) {
-                if (err) {
-                  return console.log(err);
-                }
-                console.log(body);
-                return callback();
+            if (users.length) {
+              return async.eachLimit(users, 10, function(item, callback) {
+                var op;
+                form.access_token = item.token;
+                op = {
+                  form: form,
+                  url: 'https://getpocket.com/v3/add'
+                };
+                return request.post(op, function(err, res, body) {
+                  if (err) {
+                    return console.log(err);
+                  }
+                  console.log(body);
+                  return callback();
+                });
+              }, function() {
+                return console.log("### eachLimit all do ###");
               });
-            }, function() {
-              return console.log("### eachLimit all do ###");
-            });
+            }
           }
         ]
       });
