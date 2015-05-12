@@ -9,13 +9,22 @@ MongoStore = require('connect-mongo')(session)
 bodyParser = require('body-parser')
 routes = require('./routes/index')
 users = require('./routes/users')
+fs = require('fs')
 app = express()
+
+accessLog = fs.createWriteStream 'access.log',
+  flags: 'a'
+
+errorLog  = fs.createWriteStream 'error.log',
+  flags: 'a'
+
 # view engine setup
 app.set 'views', path.join(__dirname, 'views')
 app.set 'view engine', 'jade'
 # uncomment after placing your favicon in /public
 #app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use logger('dev')
+
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
 app.use cookieParser()
@@ -28,6 +37,7 @@ app.use(session({
   resave: true
 }))
 app.use express.static(path.join(__dirname, 'public'))
+app.use logger 'combined', {stream: accessLog}
 
 app.use (req, res, next) ->
   res.locals.username = req.session.username
@@ -50,6 +60,12 @@ app.use (req, res, next) ->
   next err
   return
 # error handlers
+
+app.use (err, req, res, next) ->
+  meta = '[' + new Date() + '] ' + req.url + '\n'
+  errorLog.write(meta + err.stack + '\n');
+  next(err)
+
 # development error handler
 # will print stacktrace
 if app.get('env') == 'development'

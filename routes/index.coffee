@@ -20,7 +20,7 @@ router.get '/auth', (req, res) ->
   console.log key
 
   codeUrl = 'https://getpocket.com/v3/oauth/request'
-  redirect_uri = 'http://localhost:3000/oauth_callback'
+  redirect_uri = process.env.pocket_url
   form = {
     'consumer_key':key
     'redirect_uri':redirect_uri

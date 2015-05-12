@@ -2,6 +2,7 @@ request = require('request')
 async = require('async')
 User = require('../models/user')
 Article = require('../models/article')
+saveErr = require("../servers/saveErr")
 
 class PushUser
   constructor:(@username) ->
@@ -52,7 +53,11 @@ class PushUser
       request.post op, (err, res, body) ->
         return console.log err if err
         console.log body
-        data = JSON.parse body
+        try
+          data = JSON.parse body
+        catch
+          return saveErr op.url, 3, {err:body}
+
         console.log data.item.normal_url
         callback()
 
