@@ -118,7 +118,7 @@
                   if (err) {
                     return console.log(err);
                   }
-                  console.log(op.url);
+                  console.log(body);
                   return callback();
                 });
               }, function() {
