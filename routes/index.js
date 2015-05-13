@@ -22,7 +22,7 @@
       return res.redirect('/users');
     }
     res.render('access', {
-      title: 'Express'
+      title: 'Cnode2Pocket'
     });
   });
 

@@ -36,7 +36,7 @@ app.use(session({
   saveUninitialized: true,
   resave: true
 }))
-app.use express.static(path.join(__dirname, 'public'))
+#app.use express.static(path.join(__dirname, 'public'))
 app.use logger 'combined', {stream: accessLog}
 
 app.use (req, res, next) ->

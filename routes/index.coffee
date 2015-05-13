@@ -11,7 +11,7 @@ router = express.Router()
 router.get '/', (req, res, next) ->
   if req.session.username
     return res.redirect('/users')
-  res.render 'access', title: 'Express'
+  res.render 'access', title: 'Cnode2Pocket'
   return
 
 

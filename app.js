@@ -59,8 +59,6 @@
     resave: true
   }));
 
-  app.use(express["static"](path.join(__dirname, 'public')));
-
   app.use(logger('combined', {
     stream: accessLog
   }));
