@@ -2,7 +2,7 @@ request = require('request')
 async = require('async')
 Article = require('../models/article')
 User = require('../models/user')
-SaveErr = require('../servers/saveErr')
+saveErr = require('../servers/saveErr')
 class ArticleSave
   constructor:() ->
     @baseUrl = 'https://cnodejs.org/api/v1/topics?tab=good&page='
@@ -10,18 +10,18 @@ class ArticleSave
 
 
   getPage:(page, cb) ->
-    console.log "page=>", page
     self = @
     url = self.baseUrl + page
     console.log url
     async.auto
       getInfo:(callback) ->
         request.get url, (err, res, body) ->
-          return console.log err if err
+          return saveErr url, 1, {err:err,body:body} if err
+
           try
             data = JSON.parse(body)
           catch
-            return saveErr url, 4, {err:body}
+            return saveErr url, 3, {err:body}
 
 
           callback(null, data)
@@ -37,13 +37,12 @@ class ArticleSave
               created:Date.now()
 
             Article.findOne {url:tmp.url}, (err, row) ->
-              return console.log err if err
+              return saveErr tmp.url, 2, {err:err} if err
 
               if not row
                 newArt = new Article(tmp)
                 newArt.save (err2, row2) ->
-                  return console.log err2 if err2
-                  console.log row2
+                  return saveErr  "", 2, {err:err2} if err2
 
                 self.pushUser(tmp)
 
@@ -67,7 +66,7 @@ class ArticleSave
     async.auto
       findUser:(cb) ->
         User.find {subscribe:true}, (err, rows) ->
-          return console.log err if err
+          return saveErr "", 2, {err:err} if err
 
           users = rows
           cb()
@@ -81,12 +80,13 @@ class ArticleSave
               url:'https://getpocket.com/v3/add'
 
             request.post op, (err, res, body) ->
-              return console.log err if err
+              return saveErr op.url, 1, {err:err,body:body} if err
+
               console.log body
               callback()
 
           ,() ->
-            console.log "### eachLimit all do ###"
+            console.log "### push user subscribe #{form.url} all do ###"
       ]
 
 

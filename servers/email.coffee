@@ -11,7 +11,7 @@ module.exports = () ->
 
   send:(body, to='youqingkui@qq.com', subj='hi') ->
     transporter.sendMail
-      from: 'yuankui@qq.com'
+      from: 'youqingkui@qq.com'
       to: to
       subject: subj
       html: body

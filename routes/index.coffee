@@ -77,7 +77,7 @@ router.get '/oauth_callback', (req, res) ->
   async.auto
     getAccessInfo:(cb) ->
       request.post op, (err, response, body) ->
-        return console.log err if err
+        return saveErr op.url, 1, {err:err} if err
 
         if response.statusCode is 200
           console.log "body =>", body
@@ -88,19 +88,20 @@ router.get '/oauth_callback', (req, res) ->
 
         else
           req.session.error = "获取pocket token 出错"
+          saveErr op.url, 1, {err:body}
           return res.redirect('/')
 
 
     checkUser:['getAccessInfo', (cb, result) ->
       User.findOne {username:username}, (err, row) ->
-        return console.log err if err
+        return saveErr "", 2, {err:err} if err
         if not row
           cb()
 
         else
           row.token = token
           row.save (err2, row2) ->
-            return console.log err2 if err2
+            return saveErr "", 2, {err:err2} if err2
 
             console.log "in checkUser"
             req.session.username = row2.username
@@ -114,7 +115,7 @@ router.get '/oauth_callback', (req, res) ->
       newUser.username = username
       newUser.created = Date.now()
       newUser.save (err, row) ->
-        return console.log err if err
+        return saveErr "", 2, {err:err} if err
         console.log "in createUser"
         req.session.username = row.username
         req.session.subscribe = row.subscribe

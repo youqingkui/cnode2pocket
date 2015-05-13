@@ -10,11 +10,11 @@ class PushUser
     @articleArr = []
 
 
-
+  # 获取用户token
   getToken:(cb) ->
     self = @
     User.findOne {username:self.username}, (err, row) ->
-      return console.log err if err
+      return saveErr "", 2, {err:err} if err
 
       if not row
         cb("没有找到此用户")
@@ -23,11 +23,11 @@ class PushUser
         self.token = row.token
         cb()
 
-
+  # 获取要推送的文章
   getArticle:(cb) ->
     self = @
     Article.find (err, rows) ->
-      return console.log err if err
+      return saveErr "", 2, {err:err} if err
 
       self.articleArr = rows
 
@@ -37,7 +37,7 @@ class PushUser
   pushInfo:(cb) ->
     self = @
 
-    async.eachLimit self.articleArr, 20, (item, callback) ->
+    async.eachLimit self.articleArr, 40, (item, callback) ->
       form = {
         url:item.url
         title:item.title
@@ -51,7 +51,7 @@ class PushUser
         url:'https://getpocket.com/v3/add'
 
       request.post op, (err, res, body) ->
-        return console.log err if err
+        return saveErr op.url, 1, {err:err, body:body} if err
         try
           data = JSON.parse body
         catch
@@ -61,7 +61,7 @@ class PushUser
         callback()
 
     ,() ->
-      console.log "##### all dododo #####"
+      console.log "##### all do #{self.username} #####"
       cb()
 
 

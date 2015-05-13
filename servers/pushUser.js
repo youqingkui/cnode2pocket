@@ -26,7 +26,9 @@
         username: self.username
       }, function(err, row) {
         if (err) {
-          return console.log(err);
+          return saveErr("", 2, {
+            err: err
+          });
         }
         if (!row) {
           return cb("没有找到此用户");
@@ -42,7 +44,9 @@
       self = this;
       return Article.find(function(err, rows) {
         if (err) {
-          return console.log(err);
+          return saveErr("", 2, {
+            err: err
+          });
         }
         self.articleArr = rows;
         return cb();
@@ -52,7 +56,7 @@
     PushUser.prototype.pushInfo = function(cb) {
       var self;
       self = this;
-      return async.eachLimit(self.articleArr, 20, function(item, callback) {
+      return async.eachLimit(self.articleArr, 40, function(item, callback) {
         var form, op;
         form = {
           url: item.url,
@@ -68,7 +72,10 @@
         return request.post(op, function(err, res, body) {
           var data;
           if (err) {
-            return console.log(err);
+            return saveErr(op.url, 1, {
+              err: err,
+              body: body
+            });
           }
           try {
             data = JSON.parse(body);
@@ -81,7 +88,7 @@
           return callback();
         });
       }, function() {
-        console.log("##### all dododo #####");
+        console.log("##### all do " + self.username + " #####");
         return cb();
       });
     };

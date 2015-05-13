@@ -7,7 +7,7 @@
   saveErr = function(href, type, infoJson, cb) {
     var emailBody, log;
     console.log(infoJson.err);
-    log = new ErrLog();
+    log = {};
     log.href = href;
     log.type = type;
     log.info = JSON.stringify(infoJson);

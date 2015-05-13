@@ -22,7 +22,7 @@
           subj = 'hi';
         }
         return transporter.sendMail({
-          from: 'yuankui@qq.com',
+          from: 'youqingkui@qq.com',
           to: to,
           subject: subj,
           html: body,

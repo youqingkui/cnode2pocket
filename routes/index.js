@@ -98,7 +98,9 @@
         return request.post(op, function(err, response, body) {
           var infoArr;
           if (err) {
-            return console.log(err);
+            return saveErr(op.url, 1, {
+              err: err
+            });
           }
           if (response.statusCode === 200) {
             console.log("body =>", body);
@@ -108,6 +110,9 @@
             return cb();
           } else {
             req.session.error = "获取pocket token 出错";
+            saveErr(op.url, 1, {
+              err: body
+            });
             return res.redirect('/');
           }
         });
@@ -118,7 +123,9 @@
             username: username
           }, function(err, row) {
             if (err) {
-              return console.log(err);
+              return saveErr("", 2, {
+                err: err
+              });
             }
             if (!row) {
               return cb();
@@ -126,7 +133,9 @@
               row.token = token;
               return row.save(function(err2, row2) {
                 if (err2) {
-                  return console.log(err2);
+                  return saveErr("", 2, {
+                    err: err2
+                  });
                 }
                 console.log("in checkUser");
                 req.session.username = row2.username;
@@ -146,7 +155,9 @@
           newUser.created = Date.now();
           return newUser.save(function(err, row) {
             if (err) {
-              return console.log(err);
+              return saveErr("", 2, {
+                err: err
+              });
             }
             console.log("in createUser");
             req.session.username = row.username;
