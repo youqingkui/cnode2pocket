@@ -2,7 +2,7 @@ request = require('request')
 async = require('async')
 Article = require('../models/article')
 User = require('../models/user')
-
+SaveErr = require('../servers/saveErr')
 class ArticleSave
   constructor:() ->
     @baseUrl = 'https://cnodejs.org/api/v1/topics?tab=good&page='
@@ -18,7 +18,11 @@ class ArticleSave
       getInfo:(callback) ->
         request.get url, (err, res, body) ->
           return console.log err if err
-          data = JSON.parse(body)
+          try
+            data = JSON.parse(body)
+          catch
+            return saveErr url, 4, {err:body}
+
 
           callback(null, data)
 
@@ -78,7 +82,7 @@ class ArticleSave
 
             request.post op, (err, res, body) ->
               return console.log err if err
-              console.log body
+              console.log op.url
               callback()
 
           ,() ->

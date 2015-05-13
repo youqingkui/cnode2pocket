@@ -52,7 +52,6 @@ class PushUser
 
       request.post op, (err, res, body) ->
         return console.log err if err
-        console.log body
         try
           data = JSON.parse body
         catch

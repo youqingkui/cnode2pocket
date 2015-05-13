@@ -70,7 +70,6 @@
           if (err) {
             return console.log(err);
           }
-          console.log(body);
           try {
             data = JSON.parse(body);
           } catch (_error) {
